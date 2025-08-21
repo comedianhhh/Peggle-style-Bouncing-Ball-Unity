@@ -5,8 +5,9 @@ using Unity.Entities;
 
 public class PegAuthoring : MonoBehaviour
 {
-    public PegType pegType;
+    public PegType type;
     public int pointValue;
+    public int bonusBallAmount = 3;
     
     public class PegAuthoringBaker : Baker<PegAuthoring>
     {
@@ -17,9 +18,10 @@ public class PegAuthoring : MonoBehaviour
             AddComponent(entity, new PegTag());
             AddComponent(entity, new Peg
             {
-                Type = authoring.pegType,
+                Type = authoring.type,
                 PointValue = authoring.pointValue,
-                IsHit = false
+                IsHit = false,
+                bonusBallAmount = authoring.bonusBallAmount
             });
         }
     }

@@ -1,42 +1,43 @@
 using Unity.Burst;
-using Unity.Collections;
 using Unity.Entities;
+using Unity.Collections;
 using Unity.Transforms;
+using UnityEngine;
 
 [BurstCompile]
 public partial struct BallLifetimeSystem : ISystem
 {
-    private const float OutOfBoundsY = -10f;
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        state.RequireForUpdate<GameSettings>();
+    }
+
+    [BurstCompile]
+    public void OnDestroy(ref SystemState state)
+    {
+    }
 
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var ecb = new EntityCommandBuffer(state.WorldUpdateAllocator);
-        var gameSettings = SystemAPI.GetSingletonRW<GameSettings>();
-        
-        // Destroy balls that go out of bounds
-        foreach (var (transform, entity) in
-                 SystemAPI.Query<RefRO<LocalTransform>>()
-                     .WithAll<BallTag>()
-                     .WithNone<ScoreBucketHit>()
-                     .WithEntityAccess())
+        var gameSettingsEntity = SystemAPI.GetSingletonEntity<GameSettings>();
+        var gameSettings = SystemAPI.GetComponentRW<GameSettings>(gameSettingsEntity);
+        var ecb = new EntityCommandBuffer(Allocator.Temp);
+
+        if (gameSettings.ValueRO.gameState == GameState.Playing || gameSettings.ValueRO.gameState == GameState.Bonus)
         {
-            if (transform.ValueRO.Position.y < OutOfBoundsY)
+            foreach (var (transform, entity) in SystemAPI.Query<RefRO<LocalToWorld>>().WithEntityAccess())
             {
-                ecb.DestroyEntity(entity);
+                if (transform.ValueRO.Position.y < -20f)
+                {
+                    ecb.DestroyEntity(entity);
+                }
             }
         }
-        
-        foreach (var (scoreValue, entity) in 
-                 SystemAPI.Query<RefRO<BallScoreValue>>()
-                     .WithAll<BallTag, ScoreBucketHit>()
-                     .WithEntityAccess())
-        {
-            gameSettings.ValueRW.currentScore += scoreValue.ValueRO.Value;
-            gameSettings.ValueRW.ballsRemaining++;
-            ecb.DestroyEntity(entity);
-        }
-        
+
         ecb.Playback(state.EntityManager);
     }
+    
+
 }

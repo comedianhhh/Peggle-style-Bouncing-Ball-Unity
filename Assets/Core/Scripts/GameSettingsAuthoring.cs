@@ -4,6 +4,7 @@ using Unity.Entities;
 public class GameSettingsAuthoring : MonoBehaviour
 {
     public int startingScore = 0;
+    public int ballsLeft = 10;
     public class GameSettingsBaker : Baker<GameSettingsAuthoring>
     {
         public override void Bake(GameSettingsAuthoring authoring)
@@ -12,7 +13,9 @@ public class GameSettingsAuthoring : MonoBehaviour
             AddComponent(entity, new GameSettings
             {
                 currentScore = authoring.startingScore,
-                redPegsRemaining = 0 // This will be calculated at the start of a level
+                ballsRemaining = authoring.ballsLeft,
+                redPegsRemaining = 0, // This will be calculated at the start of a level
+                gameState = GameState.Playing
             });
         }
     }

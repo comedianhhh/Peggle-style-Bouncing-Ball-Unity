@@ -13,7 +13,6 @@ public class BallAuthoring : MonoBehaviour
             var entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new BallTag());
             AddComponent(entity, new BallState { Value = BallStateValue.ReadyToLaunch });
-            AddComponent(entity, new BallScoreValue { Value = authoring.scoreValue });
         }
     }
 }

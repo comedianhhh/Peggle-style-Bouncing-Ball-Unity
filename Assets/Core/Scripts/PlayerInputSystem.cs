@@ -10,12 +10,16 @@ public partial class PlayerInputSystem : SystemBase
 
     protected override void OnCreate()
     {
-        mainCamera = Camera.main;
+        // mainCamera will be assigned in OnUpdate
     }
 
     protected override void OnUpdate()
     {
-        if (mainCamera == null) return;
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null) return;
+        }
 
         var mousePosition = Input.mousePosition;
         var mouseClicked = Input.GetMouseButtonDown(0);
