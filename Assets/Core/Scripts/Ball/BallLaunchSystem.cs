@@ -4,6 +4,11 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
+
+
+
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateBefore(typeof(TransformSystemGroup))] // ensures LocalTransform exists before transforms update
 [BurstCompile]
 public partial struct BallLaunchSystem : ISystem
 {
@@ -11,7 +16,8 @@ public partial struct BallLaunchSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
-        foreach (var (spawner, inputData, localToWorld) in SystemAPI.Query<RefRO<BallSpawner>, RefRO<LauncherInputData>, RefRO<LocalToWorld>>())
+        foreach (var (spawner, inputData, localToWorld) in
+                 SystemAPI.Query<RefRO<BallSpawner>, RefRO<LauncherInputData>, RefRO<LocalToWorld>>())
         {
             if (!inputData.ValueRO.launch)
             {
@@ -20,18 +26,14 @@ public partial struct BallLaunchSystem : ISystem
             
             var ballEntity = ecb.Instantiate(spawner.ValueRO.BallPrefab);
 
-            var launcherPosition = localToWorld.ValueRO.Position;
-            var launchDirection = inputData.ValueRO.launchDirection;
-            var launchForce = inputData.ValueRO.launchForce;
-
             ecb.SetComponent(ballEntity, new LocalTransform
             {
-                Position = launcherPosition,
+                Position = localToWorld.ValueRO.Position,
                 Rotation = quaternion.identity,
-                Scale = 1
+                Scale = 0.5f
             });
             
-            var impulse = launchDirection * launchForce;
+            var impulse = inputData.ValueRO.launchDirection * inputData.ValueRO.launchForce;
             ecb.SetComponent(ballEntity, new PhysicsVelocity
             {
                 Linear = impulse,

@@ -5,14 +5,13 @@ using Unity.Physics;
 using Unity.Physics.Systems;
 
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
-[UpdateAfter(typeof(PhysicsSimulationGroup))]
-[UpdateBefore(typeof(ExportPhysicsWorld))]
 [BurstCompile]
 public partial struct BallPegCollisionSystem : ISystem
 {
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<SimulationSingleton>();
         state.RequireForUpdate<BallTag>();
         state.RequireForUpdate<Peg>();
         state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
@@ -23,13 +22,14 @@ public partial struct BallPegCollisionSystem : ISystem
     {
         var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-        
-        var pegCollisionJob = new PegCollisionJob
+        var sim = SystemAPI.GetSingleton<SimulationSingleton>();
+        var job = new PegCollisionJob
         {
             BallLookup = SystemAPI.GetComponentLookup<BallTag>(true),
             PegLookup = SystemAPI.GetComponentLookup<Peg>(false),
             ECB = ecb.AsParallelWriter()
         };
-        state.Dependency = pegCollisionJob.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+
+        state.Dependency = job.Schedule(sim, state.Dependency);
     }
 }

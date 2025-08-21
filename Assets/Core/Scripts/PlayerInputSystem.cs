@@ -18,23 +18,32 @@ public partial class PlayerInputSystem : SystemBase
         if (mainCamera == null) return;
 
         var mousePosition = Input.mousePosition;
-        Debug.unityLogger.Log(mousePosition);
         var mouseClicked = Input.GetMouseButtonDown(0);
 
-        foreach (var (launcher, localToWorld) in SystemAPI.Query<RefRW<LauncherInputData>, RefRO<LocalToWorld>>())
+        foreach (var (launcher, localTransform) 
+                 in SystemAPI.Query<RefRW<LauncherInputData>, RefRW<LocalTransform>>())
         {
             launcher.ValueRW.launch = mouseClicked;
-            
+
             var ray = mainCamera.ScreenPointToRay(mousePosition);
-            var plane = new Plane(Vector3.forward, 0); 
+            var plane = new Plane(Vector3.forward, 0); // XY plane (Z=0)
 
             if (plane.Raycast(ray, out var distance))
             {
                 float3 worldMousePosition = ray.GetPoint(distance);
-                var launcherPosition = localToWorld.ValueRO.Position;
-                
-                var direction = math.normalize(worldMousePosition - launcherPosition);
-                launcher.ValueRW.launchDirection = direction;
+                worldMousePosition.z = 0; // stay in XY plane
+
+                float3 launcherPos = localTransform.ValueRO.Position;
+                launcherPos.z = 0;
+
+                float2 dir = math.normalize(worldMousePosition.xy - launcherPos.xy);
+
+                // Save direction for BallLaunchSystem
+                launcher.ValueRW.launchDirection = new float3(dir.x, dir.y, 0);
+
+                // Rotate launcher toward mouse
+                float angle = math.atan2(dir.y, dir.x); // radians
+                localTransform.ValueRW.Rotation = quaternion.RotateZ(angle);
             }
         }
     }

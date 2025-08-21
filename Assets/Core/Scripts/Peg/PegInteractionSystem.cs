@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics.Systems;
+using UnityEngine;
 
 [UpdateInGroup(typeof(PhysicsSystemGroup))]
 [UpdateAfter(typeof(BallPegCollisionSystem))]
@@ -12,6 +13,7 @@ public partial struct PegInteractionSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
+        state.RequireForUpdate<GameSettings>();
     }
     
     [BurstCompile]
@@ -39,7 +41,7 @@ public partial struct PegInteractionSystem : ISystem
                     break;
 
                 case PegType.Blue:
-                    gameSettings.ValueRW.currentScore += 10;
+                    gameSettings.ValueRW.currentScore += peg.ValueRO.PointValue;
                     ecb.DestroyEntity(entity);
                     break;
 

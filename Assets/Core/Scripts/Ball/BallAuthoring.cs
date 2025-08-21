@@ -10,7 +10,7 @@ public class BallAuthoring : MonoBehaviour
     {
         public override void Bake(BallAuthoring authoring)
         {
-            var entity = GetEntity(TransformUsageFlags.Dynamic);
+            var entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new BallTag());
             AddComponent(entity, new BallState { Value = BallStateValue.ReadyToLaunch });
             AddComponent(entity, new BallScoreValue { Value = authoring.scoreValue });
