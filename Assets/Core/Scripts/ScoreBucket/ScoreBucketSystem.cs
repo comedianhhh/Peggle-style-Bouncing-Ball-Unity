@@ -111,7 +111,6 @@ public partial struct ScoreBucketHitResolutionSystem : ISystem
         {
             gameSettings.ValueRW.currentScore += bucket.scoreValue;
             ecb.RemoveComponent<ScoreBucketHit>(entity);
-            Debug.LogWarning("ScoreBucket hit! Score: " + gameSettings.ValueRW.currentScore);
         }
         
         ecb.Playback(state.EntityManager);
