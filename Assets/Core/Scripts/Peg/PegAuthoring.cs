@@ -26,5 +26,3 @@ public class PegAuthoring : MonoBehaviour
         }
     }
 }
-
-// We need a component to hold the PegType enum.
