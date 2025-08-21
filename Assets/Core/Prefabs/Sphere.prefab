@@ -153,7 +153,7 @@ MonoBehaviour:
   m_ShapeType: 2
   m_PrimitiveCenter:
     x: 0
-    y: 0
+    y: 0.79
     z: 0
   m_PrimitiveSize:
     x: 1
