@@ -2,17 +2,15 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using Unity.Burst;
 
 [UpdateInGroup(typeof(SimulationSystemGroup))]
+[BurstCompile]
 public partial class PlayerInputSystem : SystemBase
 {
     private Camera mainCamera;
 
-    protected override void OnCreate()
-    {
-        // mainCamera will be assigned in OnUpdate
-    }
-
+    [BurstCompile]
     protected override void OnUpdate()
     {
         if (mainCamera == null)

@@ -8,17 +8,17 @@ using UnityEngine;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
+[BurstCompile]
 public partial struct ScoreBucketSystem : ISystem
 {
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
         state.RequireForUpdate<SimulationSingleton>();
         state.RequireForUpdate<GameSettings>();
     }
-    
-    
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var gameSettings = SystemAPI.GetSingleton<GameSettings>();
@@ -95,13 +95,15 @@ public partial struct ScoreBucketSystem : ISystem
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(ScoreBucketSystem))]
+[BurstCompile]
 public partial struct ScoreBucketHitResolutionSystem : ISystem
 {
+    [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<GameSettings>();
     }
-
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         var ecb = new EntityCommandBuffer(Allocator.Temp);
